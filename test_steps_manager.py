@@ -1,31 +1,44 @@
-import os, tempfile
-
 import pytest
 import records
 
 from steps_manager import StepsManager
 
 @pytest.fixture
-def db():
-    db = records.Database('sqlite://')
-    db.query("create table steps ( step_text text )")
-    db.query("insert into steps values ( 'Example step 0' )")
-    db.query("insert into steps values ( 'Example step 1' )")
-    yield db
+def database():
+    database = records.Database('sqlite://')
+    database.query("create table steps ( step_text text )")
+    database.query("insert into steps values ( 'Example step 0' )")
+    database.query("insert into steps values ( 'Example step 1' )")
+    database.query("insert into steps values ( 'Example step 2' )")
+    yield database
 
-def test_it_gets_steps_from_the_db(db):
-    steps_manager = StepsManager(db)
+def test_it_gets_steps_from_the_db(database):
+    steps_manager = StepsManager(database)
 
-    steps = steps_manager.get_steps()
-    assert len(steps) == 2
-    assert steps[0] == 'Example step 0'
-    assert steps[1] == 'Example step 1'
+    assert steps_manager.get_steps() == [
+        'Example step 0',
+        'Example step 1',
+        'Example step 2',
+    ]
 
-def test_it_adds_step_to_the_db(db):
-    steps_manager = StepsManager(db)
+def test_it_adds_step_to_the_db(database):
+    steps_manager = StepsManager(database)
 
-    steps_manager.add_step('Example step 2')
+    steps_manager.add_step('Example step 3')
 
-    steps = steps_manager.get_steps()
-    assert len(steps) == 3
-    assert steps[2] == 'Example step 2'
+    assert steps_manager.get_steps() == [
+        'Example step 0',
+        'Example step 1',
+        'Example step 2',
+        'Example step 3',
+    ]
+
+def test_it_deletes_a_step_from_the_db(database):
+    steps_manager = StepsManager(database)
+
+    steps_manager.delete_step('Example step 1')
+
+    assert steps_manager.get_steps() == [
+        'Example step 0',
+        'Example step 2',
+    ]
