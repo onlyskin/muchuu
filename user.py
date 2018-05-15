@@ -4,3 +4,6 @@ class User():
 
     def get_id(self):
         return 1
+
+    def is_authenticated(self):
+        return True

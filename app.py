@@ -1,11 +1,18 @@
 from flask import Flask, request, redirect
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, login_required
 
 from user import User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 login_manager = LoginManager(app)
+login_manager.login_view = "login"
+
+my_user = User()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return my_user
 
 @app.route('/')
 def index():
@@ -16,9 +23,10 @@ def login():
     if request.method == 'GET':
         return '<form></form>'
 
-    login_user(User())
+    login_user(my_user)
     return ''
 
 @app.route('/user_details')
+@login_required
 def user_details():
-    return redirect(login)
+    return 'Secret details'
