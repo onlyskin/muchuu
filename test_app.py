@@ -17,6 +17,7 @@ def db():
         db = get_db()
         db.query("create table steps ( step_text text )")
         db.query("insert into steps values ( 'Example step 0' )")
+        db.query("insert into steps values ( 'Example step 1' )")
         yield db
         db.query("drop table steps")
 
@@ -77,12 +78,52 @@ class TestGetsDatabaseUrlFromEnvironment():
         assert steps[0].step_text == 'Example step 0'
 
 class TestStepsRoute():
+    def test_must_be_logged_in(self, client, db):
+        response = client.get('/steps')
+        
+        assert response.status_code == 302
+
     def test_gets_steps_as_json(self, client, db):
         login(client)
 
         response = client.get('/steps')
 
-        assert json.loads(response.data) == ['Example step 0']
+        assert json.loads(response.data) == [
+            'Example step 0',
+            'Example step 1',
+        ]
+
+class TestStepRoute():
+    def test_must_be_logged_in(self, client, db):
+        response = client.post('/step', data=dict(step_text=''))
+        
+        assert response.status_code == 302
+
+    def test_deletes_step(self, client, db):
+        login(client)
+
+        payload = dict(
+            step_text='Example step 0'
+        )
+        response = client.delete('/step', data=payload)
+
+        assert json.loads(response.data) == [
+            'Example step 1',
+        ]
+
+    def test_adds_step(self, client, db):
+        login(client)
+
+        payload = dict(
+            step_text='Example step 2'
+        )
+        response = client.post('/step', data=payload)
+
+        assert json.loads(response.data) == [
+            'Example step 0',
+            'Example step 1',
+            'Example step 2',
+        ]
 
 def login(client):
     payload = dict(

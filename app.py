@@ -65,3 +65,17 @@ def steps():
     steps_manager = StepsManager(get_db())
     steps = steps_manager.get_steps()
     return jsonify(steps)
+
+@app.route('/step', methods=['POST', 'DELETE'])
+@login_required
+def step():
+    steps_manager = StepsManager(get_db())
+    step_text = request.form['step_text']
+
+    if request.method == 'DELETE':
+        steps_manager.delete_step(step_text)
+    else:
+        steps_manager.add_step(step_text)
+
+    new_steps = steps_manager.get_steps()
+    return jsonify(new_steps)
