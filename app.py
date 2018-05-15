@@ -22,7 +22,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['DATABASE_URL'] = os.environ['MUCHUU_DATABASE_URL']
 login_manager = LoginManager(app)
-login_manager.login_view = "login"
+login_manager.login_view = 'login'
 
 my_user = User()
 
@@ -31,6 +31,7 @@ def load_user(user_id):
     return my_user
 
 @app.route('/')
+@login_required
 def index():
     return 'Hello World'
 
@@ -46,18 +47,13 @@ def login():
         '''
 
     if not valid_password(request):
-        return redirect("login")
+        return redirect('login')
 
     login_user(my_user)
-    return redirect("user_details")
+    return redirect('')
 
 def valid_password(request):
     return request.form['password'] == os.environ['MUCHUU_PASSWORD']
-
-@app.route('/user_details')
-@login_required
-def user_details():
-    return 'Secret details'
 
 @app.route('/steps')
 @login_required
