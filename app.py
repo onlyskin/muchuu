@@ -33,7 +33,16 @@ def load_user(user_id):
 @app.route('/')
 @login_required
 def index():
-    return 'Hello World'
+    return '''
+<html>
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <script src="static/app.bundle.js"></script>
+  </body>
+</html>
+'''
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
