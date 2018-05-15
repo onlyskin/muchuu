@@ -19,7 +19,7 @@ def close_db(e=None):
         db.close()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 app.config['DATABASE_URL'] = os.environ['MUCHUU_DATABASE_URL']
 login_manager = LoginManager(app)
 login_manager.login_view = "login"

@@ -6,6 +6,7 @@ import pytest
 import records
 
 os.environ['MUCHUU_DATABASE_URL'] = 'sqlite://'
+os.environ['SECRET_KEY'] = 'secret_key'
 
 from app import app, get_db
 app.testing = True
