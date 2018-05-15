@@ -1,10 +1,26 @@
-from flask import Flask, request, redirect
+import os
+
+import records
+from flask import Flask, request, redirect, jsonify, g, current_app
 from flask_login import LoginManager, login_user, login_required
 
 from user import User
+from steps_manager import StepsManager
+
+def get_db():
+    if 'db' not in g:
+        g.db = records.Database(current_app.config['DATABASE_URL'])
+    return g.db
+
+def close_db(e=None):
+    db = g.pop('db', None)
+
+    if db is not None:
+        db.close()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
+app.config['DATABASE_URL'] = os.environ['MUCHUU_DATABASE_URL']
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
@@ -35,10 +51,17 @@ def login():
     login_user(my_user)
     return redirect("user_details")
 
+def valid_password(request):
+    return request.form['password'] == 'good_password'
+
 @app.route('/user_details')
 @login_required
 def user_details():
     return 'Secret details'
 
-def valid_password(request):
-    return request.form['password'] == 'good_password'
+@app.route('/steps')
+@login_required
+def steps():
+    steps_manager = StepsManager(get_db())
+    steps = steps_manager.get_steps()
+    return jsonify(steps)
