@@ -28,7 +28,7 @@ def test_accessing_restricted_page_redirects_to_login(client):
 
     assert response.status_code == 302
 
-def xtest_can_read_user_details_when_logged_in(client):
+def test_can_read_user_details_when_logged_in(client):
     response = client.post('/login')
     response = client.get('/user_details')
 
