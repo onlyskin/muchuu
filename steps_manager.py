@@ -10,6 +10,9 @@ class StepsManager():
             step_text=step_text
         )
 
+    def delete_step(self, step_id):
+        pass
+
     def get_steps(self):
         steps = list(self.db.query("select step_text from steps"))
         return [step.step_text for step in steps]
