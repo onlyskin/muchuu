@@ -52,7 +52,7 @@ def login():
     return redirect("user_details")
 
 def valid_password(request):
-    return request.form['password'] == 'good_password'
+    return request.form['password'] == os.environ['MUCHUU_PASSWORD']
 
 @app.route('/user_details')
 @login_required
