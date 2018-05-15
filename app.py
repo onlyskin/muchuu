@@ -21,13 +21,19 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        return '<form></form>'
+        return '''
+        <form action="/login" method="post">
+        <label for="password-input">Password:</label>
+        <input type="password" id="password-input" name="password"></input>
+        <input type="submit" value="login"></input>
+        </form>
+        '''
 
     if not valid_password(request):
-        return redirect(login)
+        return redirect("login")
 
     login_user(my_user)
-    return ''
+    return redirect("user_details")
 
 @app.route('/user_details')
 @login_required
