@@ -23,6 +23,9 @@ def login():
     if request.method == 'GET':
         return '<form></form>'
 
+    if not valid_password(request):
+        return redirect(login)
+
     login_user(my_user)
     return ''
 
@@ -30,3 +33,6 @@ def login():
 @login_required
 def user_details():
     return 'Secret details'
+
+def valid_password(request):
+    return request.form['password'] == 'good_password'
