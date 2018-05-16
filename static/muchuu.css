@@ -22,6 +22,8 @@ body {
 .horizontal-container {
   display: flex;
   justify-content: center;
+
+  padding: 5px;
 }
 
 .vertical-container {
@@ -57,4 +59,10 @@ body {
 
 .h1-box {
   font-size: 40px;
+}
+
+@media (max-width: 600px) {
+  .get-step {
+    font-size: 40px;
+  }
 }
