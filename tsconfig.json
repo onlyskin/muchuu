@@ -3,6 +3,7 @@
     "outDir": "./out/",
     "sourceMap": true,
     "noImplicitAny": true,
+    "noUnusedLocals": true,
     "target": "es5",
     "lib": [
       "es6", "dom"

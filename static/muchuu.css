@@ -1,0 +1,60 @@
+body {
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background:
+  linear-gradient(rgba(53, 20, 115, 0.45),rgba(143, 70, 146, 0.45)),     url(/static/what-the-hex.png);
+}
+
+.padded {
+  padding: 30px;
+  margin: 20px 0px;
+}
+
+.paper {
+    border: 1px solid #ccc;
+    border-radius: 1px;
+    -webkit-box-shadow: 3px 3px 7px rgba(0,0,0,0.3);
+    background: #ffffff;
+}
+
+.horizontal-container {
+  display: flex;
+  justify-content: center;
+}
+
+.vertical-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.clickable {
+  border: 5px solid black;
+}
+
+.clickable:hover {
+  border: 5px solid #816aa4;
+  color: #816aa4;
+}
+
+.get-step {
+  font-size: 80px;
+}
+
+.add-step input {
+  width: 100%;
+  font-size: 20px;
+}
+
+.add-step .caption {
+  padding-bottom: 8px;
+}
+
+.h2-box {
+  font-size: 30px;
+}
+
+.h1-box {
+  font-size: 40px;
+}

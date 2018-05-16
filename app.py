@@ -37,6 +37,8 @@ def index():
 <html>
   <head>
     <meta charset="UTF-8">
+    <link href="static/reset.css" rel="stylesheet" type="text/css"/>
+    <link href="static/muchuu.css" rel="stylesheet" type="text/css"/>
   </head>
   <body>
     <script src="static/app.bundle.js"></script>

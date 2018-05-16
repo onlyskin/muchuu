@@ -1262,18 +1262,168 @@ else window.m = m
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var m = require("mithril");
-var page_1 = require("./page");
-m.mount(document.body, page_1.Page);
+var AddStep = {
+    view: function (vnode) {
+        return m('.add-step.padded.paper.h2-box', [
+            m('.caption', vnode.attrs.caption),
+            m('form', { onsubmit: function (e) {
+                    e.preventDefault();
+                    vnode.attrs.callback(vnode.state.step);
+                    vnode.state.step = '';
+                } }, m('input[type=text]', {
+                oninput: m.withAttr('value', function (step) { return vnode.state.step = step; }),
+                value: vnode.state.step,
+            })),
+        ]);
+    },
+};
+exports.AddStep = AddStep;
 
-},{"./page":3,"mithril":1}],3:[function(require,module,exports){
+},{"mithril":1}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var m = require("mithril");
+var page_1 = require("./page");
+var random_1 = require("./random");
+var ctrl_1 = require("./ctrl");
+var ctrl = new ctrl_1.Ctrl();
+m.route(document.body, '/', {
+    '/': { view: function () { return m(page_1.Page, { ctrl: ctrl }); } },
+    '/random': {
+        oninit: function (vnode) {
+            vnode.state.step = ctrl.randomStep();
+        },
+        view: function (vnode) { return m(random_1.Random, {
+            ctrl: ctrl,
+            step: vnode.state.step,
+        }); },
+    },
+});
+
+},{"./ctrl":5,"./page":6,"./random":7,"mithril":1}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var FLASK_BASE = "http://" + window.location.host;
+var STEPS_ENDPOINT = FLASK_BASE + "/steps";
+exports.STEPS_ENDPOINT = STEPS_ENDPOINT;
+var STEP_ENDPOINT = FLASK_BASE + "/step";
+exports.STEP_ENDPOINT = STEP_ENDPOINT;
+
+},{}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var steps_1 = require("./steps");
+;
+var Ctrl = /** @class */ (function () {
+    function Ctrl() {
+        var _this = this;
+        this.steps = [];
+        steps_1.stepManager.getSteps()
+            .then(function (steps) { return _this.steps = steps; });
+    }
+    Ctrl.prototype.randomStep = function () {
+        var index = Math.floor(Math.random() * this.steps.length);
+        return this.steps[index];
+    };
+    Ctrl.prototype.addStep = function (step) {
+        var _this = this;
+        steps_1.stepManager.addStep(step)
+            .then(function (steps) { return _this.steps = steps; });
+    };
+    Ctrl.prototype.deleteStep = function (step) {
+        var _this = this;
+        steps_1.stepManager.deleteStep(step)
+            .then(function (steps) { return _this.steps = steps; });
+    };
+    return Ctrl;
+}());
+exports.Ctrl = Ctrl;
+
+},{"./steps":8}],6:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var m = require("mithril");
+var add_step_1 = require("./add_step");
 var Page = {
-    view: function () {
-        return m('.hello', 'Hello World');
+    view: function (vnode) {
+        return m('.horizontal-container', m('.vertical-container', [
+            m('.get-step.padded.paper.clickable', {
+                onclick: function () { return m.route.set('/random'); },
+            }, 'Take a step!'),
+            m(add_step_1.AddStep, {
+                ctrl: vnode.attrs.ctrl,
+                caption: 'Add a step...',
+                callback: function (step) { return vnode.attrs.ctrl.addStep(step); },
+            }),
+        ]));
     },
 };
 exports.Page = Page;
 
-},{"mithril":1}]},{},[2]);
+},{"./add_step":2,"mithril":1}],7:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var m = require("mithril");
+var add_step_1 = require("./add_step");
+var Random = {
+    oninit: function (vnode) {
+        vnode.state.difficult = false;
+    },
+    view: function (vnode) {
+        return m('.horizontal-container', m('.vertical-container', [
+            m('.step.padded.paper.h1-box', vnode.attrs.step),
+            m('.padded.paper.h1-box.clickable', {
+                onclick: function () {
+                    vnode.attrs.ctrl.deleteStep(vnode.attrs.step);
+                    m.route.set('/');
+                },
+            }, 'I did it!'),
+            m('.padded.paper.h1-box.clickable', { onclick: function () { return vnode.state.difficult = true; } }, 'I didn\'t do it...'),
+            vnode.state.difficult ? m(add_step_1.AddStep, {
+                ctrl: vnode.attrs.ctrl,
+                caption: 'Add a simpler step:',
+                callback: function (step) {
+                    vnode.attrs.ctrl.addStep(step);
+                    vnode.attrs.ctrl.deleteStep(vnode.attrs.step);
+                    m.route.set('/');
+                },
+            }) : null,
+        ]));
+    },
+};
+exports.Random = Random;
+
+},{"./add_step":2,"mithril":1}],8:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var m = require("mithril");
+var constants_1 = require("./constants");
+var stepManager = {
+    getSteps: function () {
+        return m.request({
+            method: 'GET',
+            url: constants_1.STEPS_ENDPOINT,
+        });
+    },
+    addStep: function (step) {
+        var formData = new FormData();
+        formData.append('step_text', step);
+        return m.request({
+            method: 'POST',
+            url: constants_1.STEP_ENDPOINT,
+            data: formData,
+        });
+    },
+    deleteStep: function (step) {
+        var formData = new FormData();
+        formData.append('step_text', step);
+        return m.request({
+            method: 'DELETE',
+            url: constants_1.STEP_ENDPOINT,
+            data: formData,
+        });
+    },
+};
+exports.stepManager = stepManager;
+
+},{"./constants":4,"mithril":1}]},{},[3]);
